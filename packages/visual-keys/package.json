@@ -1,0 +1,14 @@
+{
+  "name": "@webmidikit/visual-keys",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "webmidi": "*",
+    "tone": "*"
+  }
+}

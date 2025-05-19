@@ -1,0 +1,27 @@
+{
+  "name": "webmidikit",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shawn0326/WebMIDIKit.git"
+  },
+  "author": "shawn0326",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "tone": "^15.1.22",
+    "webmidi": "^3.1.12"
+  }
+}
