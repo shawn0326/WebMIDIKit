@@ -11,7 +11,32 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Initialize synthesizer
-const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+const synth = new Tone.PolySynth(Tone.Synth, {
+  oscillator: {
+    type: 'triangle',
+    spread: 10,
+    count: 3,
+  },
+  envelope: {
+    attack: 0.005,
+    decay: 0.2,
+    sustain: 0.4,
+    release: 1.5,
+  },
+});
+
+const filter = new Tone.Filter({
+  type: 'lowpass',
+  frequency: 2000,
+  Q: 1,
+});
+
+const reverb = new Tone.Reverb({
+  decay: 2,
+  wet: 0.1,
+});
+
+synth.chain(filter, reverb, Tone.getDestination());
 
 // MIDI note to frequency conversion
 const midiToNote = (midiNote) => {
@@ -27,14 +52,14 @@ const activeNotes = new Map();
 // Track active keys for visual feedback
 const activeKeys = new Set();
 
-// Create visual keyboard with 25 keys (2 octaves + 1 key)
+// Create visual keyboard with 49 keys (4 octaves + 1 key)
 function createVisualKeyboard(container) {
   container.innerHTML = '';
   container.classList.add('keyboard');
 
-  // Starting from C3 (MIDI note 48) to C5 (MIDI note 72)
-  const startNote = 48;
-  const endNote = startNote + 24; // 25 keys
+  // Starting from C2 (MIDI note 36) to C6 (MIDI note 84)
+  const startNote = 36;
+  const endNote = startNote + 48; // 49 keys
 
   // Create a container for white keys
   const whiteKeysContainer = document.createElement('div');
@@ -124,10 +149,13 @@ function createVisualKeyboard(container) {
           (pos) => pos.note % 12 === 9 && Math.floor(pos.note / 12) === octave,
         );
         offset = aKey ? aKey.index : 0;
-      }
+      } // Position the black key between white keys
+      const whiteKeyWidth = 36;
+      const blackKeyWidth = 20;
 
-      // Position the black key between white keys
-      key.style.left = `${offset * 36 + 24}px`; // 36px is white key width
+      const adjustedOffset = (offset + 1) * whiteKeyWidth - blackKeyWidth / 2;
+
+      key.style.left = `${adjustedOffset}px`;
 
       // Add click event for mouse interaction
       key.addEventListener('mousedown', () => playNote(midiNote));
@@ -210,14 +238,12 @@ WebMidi.enable()
     if (WebMidi.inputs.length > 0) {
       const input = WebMidi.inputs[0];
       console.log(`Connected to ${input.name}`);
-      updateStatus(`Connected to MIDI device: ${input.name}`);
-
-      // Listen for note on events
+      updateStatus(`Connected to MIDI device: ${input.name}`); // Listen for note on events
       input.channels.forEach((channel) => {
         channel.addListener('noteon', (e) => {
           const midiNote = e.note.number;
-          // Only process notes within our 25-key range
-          if (midiNote >= 48 && midiNote <= 72) {
+          // Only process notes within our 49-key range
+          if (midiNote >= 36 && midiNote <= 84) {
             playNote(midiNote);
           }
         });
@@ -225,59 +251,18 @@ WebMidi.enable()
         // Listen for note off events
         channel.addListener('noteoff', (e) => {
           const midiNote = e.note.number;
-          if (midiNote >= 48 && midiNote <= 72) {
+          if (midiNote >= 36 && midiNote <= 84) {
             stopNote(midiNote);
           }
         });
       });
     } else {
-      const message = 'No MIDI input devices found. Using computer keyboard or mouse instead.';
+      const message = 'No MIDI input devices found. Please connect a MIDI device to play.';
       console.log(message);
       updateStatus(message);
     }
   })
   .catch((err) => {
     console.error('Could not enable WebMidi:', err);
-    updateStatus(`WebMidi error: ${err.message}. Using computer keyboard or mouse instead.`);
+    updateStatus(`WebMidi error: ${err.message}. Please check your MIDI device connection.`);
   });
-
-// Add computer keyboard support for testing without MIDI device
-const keyboardToMidiMap = {
-  a: 48, // C3
-  w: 49, // C#3
-  s: 50, // D3
-  e: 51, // D#3
-  d: 52, // E3
-  f: 53, // F3
-  t: 54, // F#3
-  g: 55, // G3
-  y: 56, // G#3
-  h: 57, // A3
-  u: 58, // A#3
-  j: 59, // B3
-  k: 60, // C4 (middle C)
-  o: 61, // C#4
-  l: 62, // D4
-  p: 63, // D#4
-  ';': 64, // E4
-  "'": 65, // F4
-  ']': 66, // F#4
-  '\\': 67, // G4
-};
-
-// Computer keyboard event handlers
-document.addEventListener('keydown', (e) => {
-  if (e.repeat) return; // Ignore key repeat
-
-  const midiNote = keyboardToMidiMap[e.key.toLowerCase()];
-  if (midiNote && !activeKeys.has(midiNote)) {
-    playNote(midiNote);
-  }
-});
-
-document.addEventListener('keyup', (e) => {
-  const midiNote = keyboardToMidiMap[e.key.toLowerCase()];
-  if (midiNote) {
-    stopNote(midiNote);
-  }
-});

@@ -13,6 +13,8 @@ body {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 h1 {
@@ -25,18 +27,18 @@ p {
   color: #666;
 }
 
-/* Keyboard styles */
 .keyboard {
   position: relative;
-  width: 580px; /* Width for 15 white keys (36px × 15 + borders) */
+  width: 1064px; /* Width for 28 white keys (36px × 28 + 2 borders) */
   height: 200px;
   margin: 20px auto;
+  overflow-x: auto;
 }
 
 .white-keys-container {
   display: flex;
   height: 100%;
-  width: 100%;
+  width: 1064px;
   position: relative;
   z-index: 1;
 }
@@ -47,7 +49,7 @@ p {
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* Allow clicks to pass through to white keys */
+  pointer-events: none;
   z-index: 2;
 }
 
@@ -68,11 +70,12 @@ p {
 .black-key {
   background-color: #333;
   border: 1px solid #222;
-  width: 22px;
-  height: 60%;
+  width: 20px;
+  height: 65%;
   position: absolute;
   border-radius: 0 0 4px 4px;
-  pointer-events: auto; /* Enable pointer events for black keys */
+  pointer-events: auto;
+  z-index: 3;
 }
 
 .key.active {
@@ -93,4 +96,16 @@ p {
   padding: 10px;
   color: #666;
   font-style: italic;
+}
+
+@media (max-width: 1024px) {
+  .keyboard {
+    width: 100%;
+    min-width: 720px;
+    overflow-x: auto;
+  }
+
+  body {
+    padding: 10px;
+  }
 }
