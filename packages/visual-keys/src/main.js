@@ -16,11 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Get DOM elements
   const keyboardContainer = document.getElementById('keyboard-container');
   const statusElement = document.getElementById('status');
+  const metronomeContainer = document.getElementById('metronome-container');
 
   // Create and initialize the Visual Keys application
   const app = new VisualKeysApp({
     keyboardContainer,
     statusElement,
+    metronomeContainer,
   });
 
   app
